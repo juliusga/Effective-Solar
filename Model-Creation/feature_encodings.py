@@ -80,17 +80,17 @@ def encode_part_of_day(consumption_df: pd.DataFrame, dt_column: str) -> pd.DataF
     :return: dataframe with time of day feature value added
     """
     parts_of_workday_dict = {
-        "1/5_workday": (0, 6),
-        "2/5_workday": (7, 12),
-        "3/5_workday": (13, 16),
-        "4/5_workday": (17, 23)
+        "1/4_workday": (0, 6),
+        "2/4_workday": (7, 12),
+        "3/4_workday": (13, 16),
+        "4/4_workday": (17, 23)
     }
 
     parts_of_weekend_dict = {
-        "1/5_weekend": (0, 6),
-        "2/5_weekend": (7, 10),
-        "3/5_weekend": (11, 21),
-        "4/5_weekend": (22, 23)
+        "1/4_weekend": (0, 6),
+        "2/4_weekend": (7, 10),
+        "3/4_weekend": (11, 21),
+        "4/4_weekend": (22, 23)
     }
 
     for key, interval in parts_of_workday_dict.items():
