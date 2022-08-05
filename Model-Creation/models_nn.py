@@ -184,7 +184,7 @@ def train_test_nn(dataframes_dict: dict):
 
             plt.title("Comparison (Model ID %d, epochs - %d)" % (idx, total_epochs))
             plt.legend(loc="upper left", fontsize="x-large")
-            plt.savefig("plots/model_%d_%d.png" % (idx, total_epochs))
+            plt.savefig(PLOT_FILES_LOC + "model_%d_%d.png" % (idx, total_epochs))
 
             # Cleanup plotting environment after each loop
             plt.close('all')

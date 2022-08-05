@@ -166,7 +166,7 @@ def test_baseline():
 
         plt.title("Comparison (Model Baseline %s)" % (object))
         plt.legend(loc="upper left", fontsize="x-large")
-        plt.savefig("plots/model_baseline_%s.png" % (object))
+        plt.savefig(PLOT_FILES_LOC + "model_baseline_%s.png" % (object))
 
         # Cleanup plotting environment after each loop
         plt.close('all')

@@ -77,7 +77,7 @@ def train_test_prophet(dataframes_dict: dict):
 
         plt.title("Comparison (Model Prophet %s)" % (object_name))
         plt.legend(loc="upper left", fontsize="x-large")
-        plt.savefig("plots/model_prophet_%s.png" % (object_name))
+        plt.savefig(PLOT_FILES_LOC + "model_prophet_%s.png" % (object_name))
 
         # Cleanup plotting environment after each loop
         plt.close('all')
