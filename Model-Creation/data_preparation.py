@@ -12,12 +12,12 @@ _COLS_TO_DROP = [
     'WindSpeed10m', 'Dni', 'Dhi', 'Ebh', 'GtiTracking'
 ]
 
-_COLS_TO_DROP_GENERATION = [
+_COLS_TO_DROP_CONSUMPTION = [
     'Azimuth', 'CloudOpacity', 'DewpointTemp', 'Ghi', 'GtiFixedTilt', 'PrecipitableWater', 'RelativeHumidity',
     'SnowWater', 'SurfacePressure', 'Zenith', 'AlbedoDaily', 'encoded_noon'
 ]
 
-_COLS_TO_DROP_CONSUMPTION = ['%d/4_%s' % (i, day) for i in range(1, 5) for day in ['workday', 'weekend']] + \
+_COLS_TO_DROP_GENERATION = ['%d/4_%s' % (i, day) for i in range(1, 5) for day in ['workday', 'weekend']] + \
                             ['Winter', 'Spring', 'Summer', 'Autumn']
 
 
@@ -55,17 +55,17 @@ def prepare_weather_data(df: pd.DataFrame, location: Location):
     # Merge calculated dataframe with the main one
     df = df.merge(sun_points_df, on='date_only', how='left')
 
-    df['encoded_date'] = df.apply(lambda x: encode_date(x['date_only']), axis=1)
     df['sun_activity'] = df.apply(lambda x: encode_sun_activity(x[_DATETIME_COLUMN], x['sunrise'], x['sunset']), axis=1)
     df['encoded_noon'] = df.apply(
         lambda x: get_solar_noon(x[_DATETIME_COLUMN], x['sunrise'], x['transit'], x['sunset']), axis=1)
-
-    # Wind speed and direction encoding
-    df['Wind_encoded'] = df.apply(lambda x: abs(180 - x['WindDirection10m']) * x['WindSpeed10m'], axis=1)
+    df['encoded_date'] = df.apply(lambda x: encode_date(x['date_only']), axis=1)
 
     # Zenith and azimuth angles encoding (The Sun’s position in the sky)
     df['Azimuth'] = df.apply(lambda x: abs(x['Azimuth']), axis=1)
     df['Zenith'] = df.apply(lambda x: abs(x['Zenith']), axis=1)
+
+    # Wind speed and direction encoding
+    df['Wind_encoded'] = df.apply(lambda x: abs(180 - x['WindDirection10m']) * x['WindSpeed10m'], axis=1)
 
     df = encode_part_of_day(df, _DATETIME_COLUMN)
     df = encode_part_of_year(df, _DATETIME_COLUMN)
@@ -83,7 +83,7 @@ def get_nn_dataset(df: pd.DataFrame, testing_intervals: list, sequence_len: int,
     :param target: target value of the dataset to prepare
     :return: Dataset class object with data prepared for training and testing
     """
-    columns_to_drop = _COLS_TO_DROP
+    columns_to_drop = _COLS_TO_DROP.copy()
 
     if target == 'consumption':
         columns_to_drop.extend(_COLS_TO_DROP_CONSUMPTION)
@@ -99,6 +99,7 @@ def get_nn_dataset(df: pd.DataFrame, testing_intervals: list, sequence_len: int,
 
     # Distribute the data using the sliding window method
     columns_to_drop.append(target)
+    print("drop col", columns_to_drop)
     for end_dt in df[_DATETIME_COLUMN].tolist():
         start_dt = end_dt - pd.DateOffset(hours=sequence_len - 1)
         current_seq_df = df.loc[(df[_DATETIME_COLUMN] >= start_dt) & (df[_DATETIME_COLUMN] <= end_dt)]

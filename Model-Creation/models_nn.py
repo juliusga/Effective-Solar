@@ -155,16 +155,7 @@ def train_test_nn(dataframes_dict: dict):
                 'learning_rate': [lr],
                 'sequence_len': [sequence_len],
                 'number_of_layers': [number_of_layers],
-                'train_mae': [metrics.mean_absolute_error(y_train_real, y_train_pred)],
-                'train_mse': [metrics.mean_squared_error(y_train_real, y_train_pred)],
-                'train_r2': [metrics.r2_score(y_train_real, y_train_pred)],
-                'train_rmse': [metrics.mean_squared_error(y_train_real, y_train_pred, squared=False)],
-                'train_mape': [metrics.mean_absolute_percentage_error(y_train_real, y_train_pred)],
-                'test_mae': [metrics.mean_absolute_error(y_test_real, y_test_pred)],
-                'test_mse': [metrics.mean_squared_error(y_test_real, y_test_pred)],
                 'test_r2': [metrics.r2_score(y_test_real, y_test_pred)],
-                'test_rmse': [metrics.mean_squared_error(y_test_real, y_test_pred, squared=False)],
-                'test_mape': [metrics.mean_absolute_percentage_error(y_test_real, y_test_pred)]
             }
 
             # Model results with the same parameters but different number of epochs are store in the same dataframe
@@ -172,18 +163,26 @@ def train_test_nn(dataframes_dict: dict):
                 else pd.concat([model_metrics_df, pd.DataFrame.from_dict(model_dict)])
 
             # Plot the comparison with the testing dataset
-            test_len = len(y_test_pred)
-            x = range(0, test_len)
-            plt.figure(figsize=(30, 10), dpi=160)
-            plt.plot(x, y_test_real, alpha=0.5, label='Real Values')
-            plt.plot(x, y_test_pred, alpha=0.5, label='Predicted Values')
+            fig, axs = plt.subplots(2, 2, figsize=(20, 20), dpi=160)
+            fig.suptitle("Comparison (Model ID %d, epochs - %d)" % (idx, total_epochs))
+            for n, interval in enumerate(TESTING_INTERVALS):
+                start_date, end_date = interval
+                hours = pd.date_range(start_date, end_date + pd.DateOffset(1), freq='H').tolist()[:-1]
+                axs[n // 2, n % 2].plot(
+                    hours, y_test_real[n * len(hours): (n + 1) * len(hours)], alpha=0.5, label='Real Values')
+                axs[n // 2, n % 2].plot(
+                    hours, y_test_pred[n * len(hours): (n + 1) * len(hours)], alpha=0.5, label='Predicted Values')
 
-            # Line to illustrate the end of different seasons
-            for line in range(1, 4):
-                plt.axvline(x=line * test_len / 4)
+                title = 'Testing %s - %s' % (start_date.strftime(DATE_FORMAT), end_date.strftime(DATE_FORMAT))
+                axs[n // 2, n % 2].set_title(title)
+                axs[n // 2, n % 2].legend(loc="lower left")
+                days = pd.date_range(start_date, end_date + pd.DateOffset(1))
+                axs[n // 2, n % 2].set_xticks(days)
+                axs[n // 2, n % 2].set_xticklabels([day.strftime(DATE_FORMAT) for day in days])
 
-            plt.title("Comparison (Model ID %d, epochs - %d)" % (idx, total_epochs))
-            plt.legend(loc="upper left", fontsize="x-large")
+            for ax in axs.flat:
+                ax.set(xlabel='Datetime', ylabel=target)
+
             plt.savefig(PLOT_FILES_LOC + "model_%d_%d.png" % (idx, total_epochs))
 
             # Cleanup plotting environment after each loop
@@ -195,5 +194,5 @@ def train_test_nn(dataframes_dict: dict):
 
         # Free up memory
         del dataset, model, model_dict, model_metrics_df, loss, optimizer
-        del y_train_real, y_train_pred, y_test_pred, y_test_real, total_epochs, test_len
+        del y_train_real, y_train_pred, y_test_pred, y_test_real, total_epochs
         gc.collect()

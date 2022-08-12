@@ -49,34 +49,30 @@ def train_test_prophet(dataframes_dict: dict):
         model_dict = {
             'model': [target],
             'object': [object_name],
-            'train_mae': [metrics.mean_absolute_error(y_train_real, y_train_pred)],
-            'train_mse': [metrics.mean_squared_error(y_train_real, y_train_pred)],
-            'train_r2': [metrics.r2_score(y_train_real, y_train_pred)],
-            'train_rmse': [metrics.mean_squared_error(y_train_real, y_train_pred, squared=False)],
-            'train_mape': [metrics.mean_absolute_percentage_error(y_train_real, y_train_pred)],
-            'test_mae': [metrics.mean_absolute_error(y_test_real, y_test_pred)],
-            'test_mse': [metrics.mean_squared_error(y_test_real, y_test_pred)],
             'test_r2': [metrics.r2_score(y_test_real, y_test_pred)],
-            'test_rmse': [metrics.mean_squared_error(y_test_real, y_test_pred, squared=False)],
-            'test_mape': [metrics.mean_absolute_percentage_error(y_test_real, y_test_pred)]
         }
 
         model_metrics_df = pd.DataFrame.from_dict(model_dict) if model_metrics_df is None \
             else pd.concat([model_metrics_df, pd.DataFrame.from_dict(model_dict)])
 
-        # Plot the comparison with the testing dataset
-        test_len = len(y_test_pred)
-        x = range(0, test_len)
-        plt.figure(figsize=(30, 10), dpi=160)
-        plt.plot(x, y_test_real, alpha=0.5, label='Real Values')
-        plt.plot(x, y_test_pred, alpha=0.5, label='Predicted Values')
+        fig, axs = plt.subplots(2, 2, figsize=(20, 20), dpi=160)
+        fig.suptitle("Comparison (Model Prophet %s)" % (object_name))
+        for n, interval in enumerate(TESTING_INTERVALS):
+            start_date, end_date = interval
+            curr_df = test_results_df.loc[
+                (test_results_df['ds'].dt.date >= start_date) & (test_results_df['ds'].dt.date <= end_date)]
+            axs[n // 2, n % 2].plot(curr_df['ds'], curr_df['y'], alpha=0.5, label='Real Values')
+            axs[n // 2, n % 2].plot(curr_df['ds'], curr_df['yhat'], alpha=0.5, label='Predicted Values')
+            title = 'Testing %s - %s' % (start_date.strftime(DATE_FORMAT), end_date.strftime(DATE_FORMAT))
+            axs[n // 2, n % 2].set_title(title)
+            axs[n // 2, n % 2].legend(loc="lower left")
+            days = pd.date_range(start_date, end_date + pd.DateOffset(1))
+            axs[n // 2, n % 2].set_xticks(days)
+            axs[n // 2, n % 2].set_xticklabels([day.strftime(DATE_FORMAT) for day in days])
 
-        # Line to illustrate the end of different seasons
-        for line in range(1, 4):
-            plt.axvline(x=line * test_len / 4)
+        for ax in axs.flat:
+            ax.set(xlabel='Datetime', ylabel=target)
 
-        plt.title("Comparison (Model Prophet %s)" % (object_name))
-        plt.legend(loc="upper left", fontsize="x-large")
         plt.savefig(PLOT_FILES_LOC + "model_prophet_%s.png" % (object_name))
 
         # Cleanup plotting environment after each loop
