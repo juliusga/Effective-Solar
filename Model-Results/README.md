@@ -17,29 +17,40 @@ To compare models created during this study, a baseline model was created using 
 
 Following images illustrate comparison between prediction results acquired using the baseline model and actual testing values:
 
+### Comparison plot of the "Solar 30K" baseline model
 ![Comparison plot of the "Solar 30K" baseline model][baseline_solar_30k]
 
+### Comparison plot of the "Solar 5K" baseline model
 ![Comparison plot of the "Solar 5K" baseline model][baseline_solar_5k]
 
 
 ## Facebook Prophet
 Following images illustrate comparison between prediction results acquired using the Facebook Prophet models and actual testing values:
 
+### Comparison plot of the "Solar 30K" Facebook Prophet model
 ![Comparison plot of the "Solar 30K" Facebook Prophet model][prophet_solar_30k]
 
+### Comparison plot of the "Solar 5K" Facebook Prophet model
 ![Comparison plot of the "Solar 5K" Facebook Prophet model][prophet_solar_5k]
 
+### Comparison plot of the "Household 1" Facebook Prophet model
 ![Comparison plot of the "Household 1" Facebook Prophet model][prophet_household_1]
 
+### Comparison plot of the "Household 2" Facebook Prophet model
 ![Comparison plot of the "Household 2" Facebook Prophet model][prophet_household_2]
 
 ## Neural-Networks
 Following images illustrate comparison between prediction results acquired using the Neural-Networks models and actual testing values:
 
+### Comparison plot of the "Solar 30K" Neural-Networks model
 ![Comparison plot of the "Solar 30K" Neural-Networks model][nn_solar_30k]
 
+### Comparison plot of the "Solar 5K" Neural-Networks model
 ![Comparison plot of the "Solar 5K" Neural-Networks model][nn_solar_5k]
 
+### Comparison plot of the "Household 1" Neural-Networks model
 ![Comparison plot of the "Household 1" Neural-Networks model][nn_household_1]
 
+### Comparison plot of the "Household 2" Neural-Networks model
 ![Comparison plot of the "Household 2" Neural-Networks model][nn_household_2]
+
